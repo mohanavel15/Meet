@@ -61,7 +61,6 @@ func (ws *WS) HandleWSMessage(data []byte) {
 		Data:  data_json,
 	}
 
-	fmt.Println(ws_message)
 	if ws.User == nil {
 		if ws_message.Event == "IDENTIFY" {
 			ws.Handler.Handle(ctx)

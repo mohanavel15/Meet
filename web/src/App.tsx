@@ -119,7 +119,7 @@ const App: Component = () => {
 				<Home onCreate={CreateRoom} onJoin={JoinRoom} isLoggedIn={isLoggedIn} />
 			</Show>
 			<Show when={roomID() !== undefined}>
-				<Room remoteUser={remoteUser} user={User} wsSend={wsSend} type={roomType} ric={RIC} />
+				<Room remoteUser={remoteUser} user={User} wsSend={wsSend} type={roomType()} ric={RIC} />
 			</Show>
 		</div>
 	)

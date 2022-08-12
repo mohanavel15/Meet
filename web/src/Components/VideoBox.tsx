@@ -16,10 +16,10 @@ export default function VideoBox({ video, mute, user, self, video_ref }: VideoPr
     return (
     <div class="relative flex items-center justify-center">
         <Show when={self}>
-        <video class={`bg-black w-full h-full rounded-md p-1 bg-clip-content ${ spaeaking() && "border-2 border-green-600"} m-2`} ref={video_ref} controls autoplay playsinline muted></video>
+        <video class={`bg-black w-full h-full rounded-md p-1 bg-clip-content ${ spaeaking() && "border-2 border-green-600"} m-2`} ref={video_ref} autoplay playsinline muted></video>
         </Show>
         <Show when={!self}>
-        <video class={`bg-black w-full h-full rounded-md p-1 bg-clip-content ${ spaeaking() && "border-2 border-green-600"} m-2`} ref={video_ref} controls autoplay playsinline></video>
+        <video class={`bg-black w-full h-full rounded-md p-1 bg-clip-content ${ spaeaking() && "border-2 border-green-600"} m-2`} ref={video_ref} autoplay playsinline></video>
         </Show>
         <Show when={video() === false}>
             <img class="absolute w-20 h-20 rounded-full" src={user()?.avatar_url} alt={"avatar"} />

@@ -12,7 +12,7 @@ const iceservers = {
     iceCandidatePoolSize: 10,
 }
 
-export default function Room({ user, remoteUser, wsSend, type, ric }: { user: Accessor<User>, remoteUser: Accessor<User | undefined>, wsSend: (msg: string) => void, type: Accessor<number>, ric: Accessor<string | undefined>}) {
+export default function Room({ user, remoteUser, wsSend, type, ric }: { user: Accessor<User>, remoteUser: Accessor<User | undefined>, wsSend: (msg: string) => void, type: number, ric: Accessor<string | undefined>}) {
     const [selfMuted, setSelfMuted] = createSignal(false)
     const [selfVideo, setSelfVideo] = createSignal(false)
 
@@ -25,29 +25,27 @@ export default function Room({ user, remoteUser, wsSend, type, ric }: { user: Ac
     let remote_video = (el: HTMLVideoElement) => {el.srcObject = remoteStream}
 
     const PeerConnection = new RTCPeerConnection(iceservers)
+    
     PeerConnection.onicecandidate = () => {
-        console.log("ICE")
-        wsSend(JSON.stringify({ event: "ICE_CANDIDATE", data: PeerConnection.localDescription }))
+        wsSend(JSON.stringify({ event: "ICE_CANDIDATE", data: { sdp: JSON.stringify(PeerConnection.localDescription) }}))
     }
 
     PeerConnection.ontrack = (event) => {
-        console.log("remote tracks")
         event.streams[0].getTracks().forEach(track => remoteStream.addTrack(track))
     }
-    createEffect(() => {
-        if (type() === 1) {
-            if (PeerConnection.localDescription === null) {
-                PeerConnection.createOffer().then(offer => {
-                    wsSend(JSON.stringify({ event: "ICE_CANDIDATE", data: { sdp: JSON.stringify(offer) } }))
-                    PeerConnection.setLocalDescription(offer)
-                })
-            }
-        }
-    })
 
-    setInterval(() => {
-        console.log(PeerConnection.connectionState)
-    }, 5000)
+    async function StartCall() {
+        let localStream_ = await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+        localStream_.getTracks().forEach(track => {
+          localStream.addTrack(track)
+          PeerConnection.addTrack(track, localStream_)
+        })
+    
+        const offer = await PeerConnection.createOffer()
+        await PeerConnection.setLocalDescription(offer)
+    }
+
+    if (type === 1) StartCall()
 
     createEffect(async () => {
         const ric_ = ric()
@@ -55,29 +53,24 @@ export default function Room({ user, remoteUser, wsSend, type, ric }: { user: Ac
             return
         }
 
-        await PeerConnection.setRemoteDescription(JSON.parse(ric_))
-        console.log(PeerConnection.remoteDescription)
-        if (type() !== 2) {
-            return
+        let localStream_ = await navigator.mediaDevices.getUserMedia({ video: false, audio: true })
+        localStream_.getTracks().forEach(track => {
+          localStream.addTrack(track)
+          PeerConnection.addTrack(track, localStream_)
+        })
+
+        if (PeerConnection.remoteDescription === null) {
+            await PeerConnection.setRemoteDescription(JSON.parse(ric_))
+        } else {
+            await PeerConnection.addIceCandidate(JSON.parse(ric_))
         }
 
-        if (PeerConnection.localDescription !== null) {
+        if (type !== 2 || PeerConnection.localDescription !== null) {
             return
         }
 
         const answer = await PeerConnection.createAnswer()
-        console.log("ice ...")
         await PeerConnection.setLocalDescription(answer)
-        wsSend(JSON.stringify({ event: "ICE_CANDIDATE", data: { sdp: JSON.stringify(answer) }}))
-    })
-
-    createEffect(() => {
-        navigator.mediaDevices.getUserMedia({ video: false, audio: !selfMuted() }).then(localStream_ => {
-            localStream_.getTracks().forEach(track => {
-                PeerConnection.addTrack(track, localStream)
-                localStream.addTrack(track)
-            })
-        })
     })
 
     createEffect(() => {
