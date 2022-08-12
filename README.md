@@ -2,7 +2,7 @@
 
 2 person Video/Audio call app built with Go Fiber, Solid JS, TailwindCSS and uses github oauth.
 
-#### Still in development and only tested in localhost
+#### It works but needs refactoring and only tested in localhost
 
 ## To Run
 
