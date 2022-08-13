@@ -1,7 +1,7 @@
 package restapi
 
 import (
-	"Meet/auth"
+	"Meet/pkg/github"
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
@@ -13,7 +13,7 @@ func GetUser(ctx *fiber.Ctx) error {
 		return ctx.SendStatus(http.StatusUnauthorized)
 	}
 
-	response, statusCode := auth.GetUser(accessToken)
+	response, statusCode := github.GetUser(accessToken)
 	if statusCode != http.StatusOK {
 		return ctx.SendStatus(statusCode)
 	}

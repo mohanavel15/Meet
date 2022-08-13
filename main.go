@@ -1,9 +1,9 @@
 package main
 
 import (
-	"Meet/gateway"
-	"Meet/restapi"
-	"Meet/ws"
+	"Meet/pkg/gateway"
+	"Meet/pkg/restapi"
+	"Meet/pkg/ws"
 	"log"
 
 	"github.com/gofiber/fiber/v2"

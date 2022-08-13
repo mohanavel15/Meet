@@ -1,7 +1,7 @@
 package gateway
 
 import (
-	"Meet/ws"
+	"Meet/pkg/ws"
 	"encoding/json"
 )
 

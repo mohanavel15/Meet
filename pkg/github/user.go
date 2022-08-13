@@ -1,7 +1,7 @@
-package auth
+package github
 
 import (
-	"Meet/models"
+	"Meet/pkg/models"
 	"encoding/json"
 	"log"
 	"net/http"

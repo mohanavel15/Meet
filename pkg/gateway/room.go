@@ -1,8 +1,8 @@
 package gateway
 
 import (
-	"Meet/models"
-	"Meet/ws"
+	"Meet/pkg/models"
+	"Meet/pkg/ws"
 	"encoding/json"
 
 	"github.com/google/uuid"

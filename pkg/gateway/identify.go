@@ -1,8 +1,8 @@
 package gateway
 
 import (
-	"Meet/auth"
-	"Meet/ws"
+	"Meet/pkg/github"
+	"Meet/pkg/ws"
 	"encoding/json"
 	"fmt"
 )
@@ -19,7 +19,7 @@ func Identify(ctx *ws.Context) {
 		return
 	}
 
-	user, code := auth.GetUser(accessToken.AccessToken)
+	user, code := github.GetUser(accessToken.AccessToken)
 	if code != 200 {
 		ctx.Ws.Conn.Close()
 		return

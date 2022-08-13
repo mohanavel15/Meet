@@ -1,7 +1,7 @@
 package main
 
 import (
-	"Meet/ws"
+	"Meet/pkg/ws"
 
 	"github.com/gofiber/websocket/v2"
 )

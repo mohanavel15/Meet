@@ -1,7 +1,7 @@
 package restapi
 
 import (
-	"Meet/auth"
+	"Meet/pkg/github"
 	"net/http"
 	"time"
 
@@ -10,7 +10,7 @@ import (
 
 func Oauth(ctx *fiber.Ctx) error {
 	code := ctx.Query("code")
-	response, statusCode := auth.Oauth(code)
+	response, statusCode := github.Oauth(code)
 	if statusCode != http.StatusOK {
 		return ctx.SendStatus(statusCode)
 	}

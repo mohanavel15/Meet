@@ -1,7 +1,7 @@
 package ws
 
 import (
-	"Meet/models"
+	"Meet/pkg/models"
 	"encoding/json"
 	"fmt"
 	"strings"
