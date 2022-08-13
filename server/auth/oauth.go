@@ -17,7 +17,7 @@ var (
 )
 
 func Oauth(code string) (models.Oauth, int) {
-	url := fmt.Sprintf("https://github.com/login/oauth/access_token?client_id=%s&client_secret=%s&code=%s&redirect_uri=%s", ClientID, ClientSecret, code, "http://localhost:5000/api/auth/callback")
+	url := fmt.Sprintf("https://github.com/login/oauth/access_token?client_id=%s&client_secret=%s&code=%s", ClientID, ClientSecret, code)
 
 	agent := fiber.AcquireAgent()
 	req := agent.Request()
