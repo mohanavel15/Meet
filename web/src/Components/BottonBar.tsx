@@ -8,9 +8,9 @@ import {
 
 interface BottonBarProps {
     mute: Accessor<boolean>
-    setMute: Setter<boolean>
+    setMute: (bool: boolean) => void
     video: Accessor<boolean>
-    setVideo: Setter<boolean>
+    setVideo: (bool: boolean) => void
     endCall: () => void
 }
 

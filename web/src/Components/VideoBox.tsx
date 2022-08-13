@@ -1,21 +1,18 @@
-import { Accessor, createSignal, Show } from "solid-js"
+import { Accessor, JSX, Show } from "solid-js"
 import User from "../Models/User"
 import { BiSolidMicrophoneOff } from 'solid-icons/bi'
 
 interface VideoProps {
+    children: JSX.Element
     video: Accessor<boolean>
     mute: Accessor<boolean>
     user: Accessor<User | undefined>
-    self: boolean
-    video_ref: (el: HTMLVideoElement) => void
 }
 
-export default function VideoBox({ video, mute, user, self, video_ref }: VideoProps) {
-    const [spaeaking, setspaeaking] = createSignal(false)
-
+export default function VideoBox({ children, video, mute, user }: VideoProps) {
     return (
     <div class="relative flex items-center justify-center w-5/6 sm:w-4/6 m-2 ">
-        <video class={`bg-black w-full h-full rounded-md p-1 bg-clip-content ${ spaeaking() && "border-2 border-green-600"}`} ref={video_ref} autoplay playsinline muted={self}></video>
+        { children }
         <Show when={video() === false}>
             <img class="absolute w-20 h-20 rounded-full" src={user()?.avatar_url} alt={"avatar"} />
         </Show>
