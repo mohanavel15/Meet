@@ -22,7 +22,7 @@ const App: Component = () => {
 		const accessToken = cookie.match(/gho_[A-Za-z0-9]+/)
 		if (accessToken === null) return
 
-		const response = await fetch("http://localhost:5000/api/user", {
+		const response = await fetch("/api/user", {
 			headers: {
 				'Authorization': accessToken[0]
 			},
@@ -88,7 +88,7 @@ const App: Component = () => {
 
 	}
 
-	const [connect, _, wsSend] = createWebsocket("ws://localhost:5000/ws", onMessage, (e: Event) => {} ,[], 3, 5000);
+	const [connect, _, wsSend] = createWebsocket("ws://localhost:3000/api/ws", onMessage, (e: Event) => {} ,[], 3, 5000);
 	connect()
 	
 	function CreateRoom() {

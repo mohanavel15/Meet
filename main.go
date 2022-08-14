@@ -26,7 +26,9 @@ func main() {
 
 	app.Get("/api/auth/callback", restapi.Oauth)
 	app.Get("/api/user", restapi.GetUser)
-	app.Get("/ws", websocket.New(Gateway))
+	app.Get("/api/ws", websocket.New(Gateway))
+	app.Static("/assets", "./web/dist/assets")
+	app.Static("*", "./web/dist/index.html")
 
 	eventhandler.On("IDENTIFY", gateway.Identify)
 	eventhandler.On("CREATE_ROOM", gateway.CreateRoom)
