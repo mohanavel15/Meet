@@ -60,6 +60,9 @@ export default function Room({ user, remoteUser, wsSend, type, ric }: { user: Ac
     }
 
     createEffect(async () => {
+        const RawStream = stream()
+        if (RawStream === undefined) return
+        
         const remote_ice = ric()
         if (remote_ice === undefined || remote_ice === "") return
 
@@ -107,7 +110,7 @@ export default function Room({ user, remoteUser, wsSend, type, ric }: { user: Ac
                 </VideoBox>
                 </Show>
                 <VideoBox video={selfVideo} mute={selfMuted} user={user}>
-                <video class={`bg-black w-full h-full rounded-md p-1 bg-clip-content ${ false && "border-2 border-green-600"}`} prop:srcObject={stream()} autoplay playsinline muted></video>
+                <video class={`bg-black w-full h-full rounded-md p-1 bg-clip-content ${ false && "border-2 border-green-600"}`} prop:srcObject={stream()} autoplay playsinline muted={true}></video>
                 </VideoBox>
             </div>
             <BottonBar mute={selfMuted} video={selfVideo} setMute={Mute} setVideo={Video} endCall={endCall} />

@@ -7,6 +7,7 @@ import WSMsg from "./Models/WSMsg";
 
 import Home from './pages/home';
 import Room from './pages/room';
+import URLs from "./config";
 
 const App: Component = () => {
 	const [isLoggedIn, setIsLoggedIn] = createSignal(false)
@@ -59,7 +60,7 @@ const App: Component = () => {
 
 	}
 
-	const [connect, _, wsSend] = createWebsocket("ws://localhost:3000/api/ws", onMessage, (e: Event) => {} ,[], 3, 5000);
+	const [connect, _, wsSend] = createWebsocket(URLs.websocket, onMessage, (e: Event) => {} ,[], 3, 5000);
 	
 	function CreateRoom() {
 		if (wsState() < 2) return

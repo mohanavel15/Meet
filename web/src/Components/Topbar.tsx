@@ -1,7 +1,6 @@
 import { Accessor, createSignal, Show } from "solid-js";
+import URLs from "../config";
 import User from "../Models/User";
-
-const oauth_url = "https://github.com/login/oauth/authorize?client_id=a53c416da46ab127f71a&redirect_uri=http://localhost:5000/api/auth/callback"
 
 export default function Topbar({ user, isLoggedIn, roomID }: { user: Accessor<User>, isLoggedIn: Accessor<boolean>, roomID: Accessor<string | undefined> }) {
     const [showLogOut, setShowLogOut] = createSignal(false)
@@ -32,7 +31,7 @@ export default function Topbar({ user, isLoggedIn, roomID }: { user: Accessor<Us
             </div>
         </Show>
         <Show when={!isLoggedIn()}>
-            <a class="px-3 py-1 rounded-md bg-black" href={oauth_url}>Login</a>
+            <a class="px-3 py-1 rounded-md bg-black" href={URLs.oauth_url}>Login</a>
         </Show>
     </div>
   )
