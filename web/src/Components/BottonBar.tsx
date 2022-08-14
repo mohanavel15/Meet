@@ -1,4 +1,4 @@
-import { Accessor, createSignal, JSX, Setter, Show } from "solid-js"
+import { Accessor, createSignal, JSX, Show } from "solid-js"
 import { BiSolidMicrophone, BiSolidMicrophoneOff } from 'solid-icons/bi'
 import { 
     BsCameraVideoFill, 

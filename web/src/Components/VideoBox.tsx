@@ -11,7 +11,7 @@ interface VideoProps {
 
 export default function VideoBox({ children, video, mute, user }: VideoProps) {
     return (
-    <div class="relative flex items-center justify-center w-5/6 sm:w-4/6 m-2 ">
+    <div class="relative flex items-center justify-center h-1/2 w-full sm:h-full sm:w-1/2 m-2">
         { children }
         <Show when={video() === false}>
             <img class="absolute w-20 h-20 rounded-full" src={user()?.avatar_url} alt={"avatar"} />

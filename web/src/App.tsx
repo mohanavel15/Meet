@@ -11,29 +11,11 @@ import Room from './pages/room';
 const App: Component = () => {
 	const [isLoggedIn, setIsLoggedIn] = createSignal(false)
 	const [wsState, setWsState] = createSignal(0)
-	const [roomType, setRoomType] = createSignal(0) // RTCSessionDescriptionInit
+	const [roomType, setRoomType] = createSignal(0)
 	const [roomID, setRoomID] = createSignal<string | undefined>()
 	const [RIC, setRIC] = createSignal<string | undefined>()
 	const [User, setUser] = createSignal<User>({} as User)
 	const [remoteUser, setRemoteUser] = createSignal<User | undefined>()
-
-	onMount(async () => {
-		const cookie = document.cookie
-		const accessToken = cookie.match(/gho_[A-Za-z0-9]+/)
-		if (accessToken === null) return
-
-		const response = await fetch("/api/user", {
-			headers: {
-				'Authorization': accessToken[0]
-			},
-		})
-
-		if (response.ok) {
-			const user: User = await response.json()
-			setUser(user)
-			setIsLoggedIn(true)
-		}
-	})
 
 	const onMessage = (msg: MessageEvent) => {
 		const data = msg.data
@@ -41,19 +23,8 @@ const App: Component = () => {
 
 		console.log(ws_msg)
 		const event = ws_msg.event
-		if (event === "CONNECTED") {
-			setWsState(1)
-			const cookie = document.cookie
-			const accessToken = cookie.match(/gho_[A-Za-z0-9]+/)
-			if (accessToken === null) return
 
-			const new_ws_msg = {
-				event: "IDENTIFY",
-				data: { access_token: accessToken[0] }
-			}
-			wsSend(JSON.stringify(new_ws_msg))
-
-		} else if (event === "READY") {
+		if (event === "READY") {
 			setWsState(2)
 
 		} else if (event === "CREATE_ROOM") {
@@ -89,7 +60,6 @@ const App: Component = () => {
 	}
 
 	const [connect, _, wsSend] = createWebsocket("ws://localhost:3000/api/ws", onMessage, (e: Event) => {} ,[], 3, 5000);
-	connect()
 	
 	function CreateRoom() {
 		if (wsState() < 2) return
@@ -111,6 +81,16 @@ const App: Component = () => {
 			}
 		}))
 	}
+
+	onMount(async () => {
+		const response = await fetch("/api/user")
+		if (response.ok) {
+			const user: User = await response.json()
+			setUser(user)
+			setIsLoggedIn(true)
+			connect()
+		}
+	})
 
 	return (
 		<div class="text-white flex flex-col items-center bg-gray-800 h-screen w-full">
