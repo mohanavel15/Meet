@@ -7,7 +7,6 @@ import (
 	"log"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/websocket/v2"
 )
 
@@ -18,11 +17,6 @@ var (
 
 func main() {
 	app := fiber.New()
-	app.Use(cors.New(cors.Config{
-		AllowMethods: "GET,POST",
-		AllowOrigins: "*",
-		AllowHeaders: "*",
-	}))
 
 	app.Get("/api/auth/callback", restapi.Oauth)
 	app.Get("/api/user", restapi.GetUser)
@@ -30,7 +24,6 @@ func main() {
 	app.Static("/assets", "./web/dist/assets")
 	app.Static("*", "./web/dist/index.html")
 
-	eventhandler.On("IDENTIFY", gateway.Identify)
 	eventhandler.On("CREATE_ROOM", gateway.CreateRoom)
 	eventhandler.On("JOIN_ROOM", gateway.JoinRoom)
 	eventhandler.On("LEAVE_ROOM", gateway.LeaveRoom)

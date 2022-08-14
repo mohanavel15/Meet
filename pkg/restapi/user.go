@@ -8,7 +8,7 @@ import (
 )
 
 func GetUser(ctx *fiber.Ctx) error {
-	accessToken := ctx.GetReqHeaders()["Authorization"]
+	accessToken := ctx.Cookies("access_token")
 	if accessToken == "" {
 		return ctx.SendStatus(http.StatusUnauthorized)
 	}

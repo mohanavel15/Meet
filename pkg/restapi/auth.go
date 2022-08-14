@@ -19,8 +19,8 @@ func Oauth(ctx *fiber.Ctx) error {
 	cookie.Name = "access_token"
 	cookie.Value = response.AccessToken
 	cookie.Expires = time.Now().Add(24 * time.Hour)
-	cookie.HTTPOnly = false
+	cookie.HTTPOnly = true
 	cookie.Secure = false
 	ctx.Cookie(cookie)
-	return ctx.Redirect("http://localhost:3000")
+	return ctx.Redirect("/")
 }
