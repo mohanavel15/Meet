@@ -1,4 +1,4 @@
-import { createStream } from "@solid-primitives/stream";
+import { createMediaPermissionRequest, createStream } from "@solid-primitives/stream";
 import { Accessor, createEffect, createSignal, Show } from "solid-js";
 import BottonBar from "../Components/BottonBar";
 import VideoBox from "../Components/VideoBox";
@@ -23,14 +23,13 @@ declare module "solid-js" {
 
 export default function Room({ user, remoteUser, wsSend, type, ric }: { user: Accessor<User>, remoteUser: Accessor<User | undefined>, wsSend: (msg: string) => void, type: number, ric: Accessor<string | undefined>}) {
     const [selfMuted, setSelfMuted] = createSignal(false)
-    const [selfVideo, setSelfVideo] = createSignal(true)
+    const [selfVideo, setSelfVideo] = createSignal(false)
     const [remoteMuted, setRemoteMuted] = createSignal(false)
     const [remoteVideo, setRemoteVideo] = createSignal(false)
-
+    
+    createMediaPermissionRequest()
     const [stream, { mutate, stop }] = createStream({ video: selfVideo(), audio: !selfMuted() })
-
-    let remoteStream = new MediaStream()
-    let remote_video = (el: HTMLVideoElement) => {el.srcObject = remoteStream}
+    const [remoteStream, setRemoteStream] = createSignal<MediaStream>()
 
     const PeerConnection = new RTCPeerConnection(iceservers)
     
@@ -39,7 +38,7 @@ export default function Room({ user, remoteUser, wsSend, type, ric }: { user: Ac
     }
 
     PeerConnection.ontrack = (event) => {
-        event.streams[0].getTracks().forEach(track => remoteStream.addTrack(track))
+        setRemoteStream(event.streams[0])
     }
 
     createEffect(() => {
@@ -75,10 +74,6 @@ export default function Room({ user, remoteUser, wsSend, type, ric }: { user: Ac
         if (type === 2 && PeerConnection.localDescription === null) AnswerCall()
     })
 
-    createEffect(() => {
-        
-    })
-
     function Mute(bool: boolean) {
         setSelfMuted(bool)
         mutate(s => {
@@ -105,13 +100,9 @@ export default function Room({ user, remoteUser, wsSend, type, ric }: { user: Ac
         <div class="flex flex-col w-full h-full items-center">
             <div class="flex flex-col sm:flex-row h-full items-center justify-center">
                 <Show when={remoteUser() !== undefined}>
-                <VideoBox video={remoteVideo} mute={remoteMuted} user={remoteUser}>
-                <video class={`bg-black w-full h-full rounded-md p-1 bg-clip-content ${ false && "border-2 border-green-600"}`} ref={remote_video} autoplay playsinline></video>
-                </VideoBox>
+                    <VideoBox video={remoteVideo} self={false} stream={remoteStream} mute={remoteMuted} user={remoteUser} />
                 </Show>
-                <VideoBox video={selfVideo} mute={selfMuted} user={user}>
-                <video class={`bg-black w-full h-full rounded-md p-1 bg-clip-content ${ false && "border-2 border-green-600"}`} prop:srcObject={stream()} autoplay playsinline muted={true}></video>
-                </VideoBox>
+                <VideoBox video={selfVideo} self={true} stream={stream} mute={selfMuted} user={user} />
             </div>
             <BottonBar mute={selfMuted} video={selfVideo} setMute={Mute} setVideo={Video} endCall={endCall} />
         </div>

@@ -5,6 +5,7 @@ import (
 	"Meet/pkg/restapi"
 	"Meet/pkg/ws"
 	"log"
+	"os"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/websocket/v2"
@@ -13,9 +14,14 @@ import (
 var (
 	connections  = ws.NewConnections()
 	eventhandler = ws.NewEventHandler()
+	PORT         = os.Getenv("PORT")
 )
 
 func main() {
+	if PORT == "" {
+		log.Fatal("PORT is not set")
+	}
+
 	app := fiber.New()
 
 	app.Get("/api/auth/callback", restapi.Oauth)
@@ -29,5 +35,5 @@ func main() {
 	eventhandler.On("LEAVE_ROOM", gateway.LeaveRoom)
 	eventhandler.On("ICE_CANDIDATE", gateway.IceCandidate)
 
-	log.Fatal(app.Listen(":5000"))
+	log.Fatal(app.Listen(":" + PORT))
 }

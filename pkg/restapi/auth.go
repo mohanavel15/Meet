@@ -10,6 +10,9 @@ import (
 
 func Oauth(ctx *fiber.Ctx) error {
 	code := ctx.Query("code")
+	if code == "" {
+		return ctx.SendStatus(http.StatusExpectationFailed)
+	}
 	response, statusCode := github.Oauth(code)
 	if statusCode != http.StatusOK {
 		return ctx.SendStatus(statusCode)
