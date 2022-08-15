@@ -1,13 +1,17 @@
-import { Component, createSignal, onMount, Show } from "solid-js";
+import { Component, createSignal, onMount, Show, lazy } from "solid-js";
 import createWebsocket from '@solid-primitives/websocket'
 
 import Topbar from "./Components/Topbar";
 import User from "./Models/User";
 import WSMsg from "./Models/WSMsg";
 
-import Home from './pages/home';
-import Room from './pages/room';
+const Home = lazy(() => import("./pages/home"));
+const Room = lazy(() => import("./pages/room"));
+const PageNotFound = lazy(() => import("./pages/PageNotFound"))
+
 import URLs from "./config";
+
+import { Route, Routes, useNavigate } from "@solidjs/router";
 
 const App: Component = () => {
 	const [isLoggedIn, setIsLoggedIn] = createSignal(false)
@@ -17,7 +21,8 @@ const App: Component = () => {
 	const [RIC, setRIC] = createSignal<string | undefined>()
 	const [User, setUser] = createSignal<User>({} as User)
 	const [remoteUser, setRemoteUser] = createSignal<User | undefined>()
-
+	const navigate = useNavigate()
+	
 	const onMessage = (msg: MessageEvent) => {
 		const data = msg.data
 		const ws_msg: WSMsg = JSON.parse(data)
@@ -32,6 +37,7 @@ const App: Component = () => {
 			const roomID: string = ws_msg.data.room_id
 			setRoomType(1)
 			setRoomID(roomID)
+			navigate(`/rooms/${roomID}`)
 
 		} else if (event === "JOIN_ROOM") {
 			const roomID: string = ws_msg.data.room_id
@@ -41,6 +47,7 @@ const App: Component = () => {
 			setRoomID(roomID)
 			setRemoteUser(remoteUser)
 			setRIC(ice_candidate)
+			navigate(`/rooms/${roomID}`)
 
 		} else if (event === "LEAVE_ROOM") {
 			setRoomType(0)
@@ -53,11 +60,11 @@ const App: Component = () => {
 
 		} else if (event === "USER_LEAVE") {
 			setRemoteUser(undefined)
+			
 		} else if (event === "ICE_CANDIDATE") {
 			const ric = ws_msg.data
 			setRIC(ric)
 		}
-
 	}
 
 	const [connect, _, wsSend] = createWebsocket(URLs.websocket, onMessage, (e: Event) => {} ,[], 3, 5000);
@@ -96,12 +103,11 @@ const App: Component = () => {
 	return (
 		<div class="text-white flex flex-col items-center bg-gray-800 h-screen w-full">
 			<Topbar user={User} isLoggedIn={isLoggedIn} roomID={roomID} />
-			<Show when={roomID() === undefined}>
-				<Home onCreate={CreateRoom} onJoin={JoinRoom} isLoggedIn={isLoggedIn} />
-			</Show>
-			<Show when={roomID() !== undefined}>
-				<Room remoteUser={remoteUser} user={User} wsSend={wsSend} type={roomType()} ric={RIC} />
-			</Show>
+			<Routes>
+      			<Route path="/" element={<Home onCreate={CreateRoom} onJoin={JoinRoom} isLoggedIn={isLoggedIn} />} />
+      			<Route path="/rooms/:id" element={<Room remoteUser={remoteUser} user={User} wsSend={wsSend} type={roomType()} ric={RIC} />} />
+				<Route path="*" component={PageNotFound} />
+    		</Routes>
 		</div>
 	)
 }

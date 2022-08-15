@@ -20,6 +20,7 @@
   "dependencies": {
     "@solid-primitives/stream": "^0.3.0",
     "@solid-primitives/websocket": "^0.3.0",
+    "@solidjs/router": "^0.4.2",
     "solid-icons": "^1.0.1",
     "solid-js": "^1.4.7"
   }
