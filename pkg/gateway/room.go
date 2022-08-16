@@ -4,31 +4,11 @@ import (
 	"Meet/pkg/models"
 	"Meet/pkg/ws"
 	"encoding/json"
-
-	"github.com/google/uuid"
 )
 
 type RoomID struct {
 	RoomID string       `json:"room_id"`
 	State  models.State `json:"state"`
-}
-
-func CreateRoom(ctx *ws.Context) {
-	roomId := uuid.New().String()
-
-	var createRoom RoomID
-	err := json.Unmarshal(ctx.Data, &createRoom)
-	if err != nil {
-		return
-	}
-
-	ctx.Ws.RoomID = roomId
-	ctx.Ws.Conns.AddToRoom(roomId, ctx.Ws)
-
-	ctx.Ws.State.Mute = createRoom.State.Mute
-	ctx.Ws.State.Video = createRoom.State.Video
-
-	ctx.Ws.Send("CREATE_ROOM", RoomID{RoomID: roomId})
 }
 
 func JoinRoom(ctx *ws.Context) {
@@ -56,8 +36,14 @@ func JoinRoom(ctx *ws.Context) {
 	ctx.Ws.RoomID = joinRoom.RoomID
 	ctx.Ws.Conns.AddToRoom(joinRoom.RoomID, ctx.Ws)
 
-	ctx.Ws.Send("JOIN_ROOM", models.JOIN_ROOM{RoomID: joinRoom.RoomID, User: *other_user.User, IC: other_user.IC, State: other_user.State})
+	res := models.JOIN_ROOM{RoomID: joinRoom.RoomID}
+	if other_user != nil {
+		res.User = *other_user.User
+		res.IC = other_user.IC
+		res.State = other_user.State
+	}
 
+	ctx.Ws.Send("JOIN_ROOM", res)
 	user_join := models.USER_JOIN{User: *ctx.Ws.User, State: ctx.Ws.State}
 	ctx.Ws.Conns.Send(joinRoom.RoomID, ctx.Ws.User.ID, "USER_JOIN", user_join)
 }

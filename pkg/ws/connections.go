@@ -20,10 +20,19 @@ func (conns *Connections) GetRoom(roomID string) (map[int]*WS, bool) {
 	return room, ok
 }
 
-func (conns *Connections) AddToRoom(room string, conn *WS) {
+func (conns *Connections) CreateRoom(room string) {
 	conns.mutex.Lock()
 	if _, ok := conns.rooms[room]; !ok {
 		conns.rooms[room] = make(map[int]*WS)
+	}
+	conns.mutex.Unlock()
+}
+
+func (conns *Connections) AddToRoom(room string, conn *WS) {
+	conns.mutex.Lock()
+	if _, ok := conns.rooms[room]; !ok {
+		conns.mutex.Unlock()
+		return
 	}
 	conns.rooms[room][conn.User.ID] = conn
 	conns.mutex.Unlock()
