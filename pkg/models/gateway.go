@@ -4,7 +4,7 @@ type JOIN_ROOM struct {
 	RoomID string `json:"room_id"`
 	User   User   `json:"user"`
 	State  State  `json:"state"`
-	IC     string `json:"ice_candidate"`
+	ICE    string `json:"ice_candidate"`
 }
 
 type USER_JOIN struct {

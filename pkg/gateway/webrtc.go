@@ -6,7 +6,7 @@ import (
 )
 
 type OnIceCandidate struct {
-	SDP string `json:"sdp"`
+	ICE string `json:"ice"`
 }
 
 func IceCandidate(ctx *ws.Context) {
@@ -16,6 +16,6 @@ func IceCandidate(ctx *ws.Context) {
 		return
 	}
 
-	ctx.Ws.IC = data.SDP
-	ctx.Ws.Conns.Send(ctx.Ws.RoomID, ctx.Ws.User.ID, "ICE_CANDIDATE", data.SDP)
+	ctx.Ws.ICE = data.ICE
+	ctx.Ws.Conns.Send(ctx.Ws.RoomID, ctx.Ws.User.ID, ctx.Event, data.ICE)
 }

@@ -38,14 +38,14 @@ func (conns *Connections) AddToRoom(room string, conn *WS) {
 	conns.mutex.Unlock()
 }
 
-func (conns *Connections) RemoveFromRoom(room string, conn *WS) {
+func (conns *Connections) RemoveFromRoom(room string, user int) {
 	conns.mutex.Lock()
 	if _, ok := conns.rooms[room]; !ok {
 		conns.mutex.Unlock()
 		return
 	}
 
-	delete(conns.rooms[room], conn.User.ID)
+	delete(conns.rooms[room], user)
 	if len(conns.rooms[room]) == 0 {
 		delete(conns.rooms, room)
 	}

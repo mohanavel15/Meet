@@ -15,7 +15,7 @@ type WS struct {
 	Conn    *websocket.Conn
 	Conns   *Connections
 	Handler *EventHandler
-	IC      string
+	ICE     string
 	RoomID  string
 }
 
@@ -23,6 +23,7 @@ func (ws *WS) ReadLoop() {
 	for {
 		_, data, err := ws.Conn.ReadMessage()
 		if err != nil {
+			ws.Disconnect()
 			return
 		}
 		ws.HandleWSMessage(data)
@@ -40,7 +41,10 @@ func (ws *WS) Send(event string, data interface{}) {
 		return
 	}
 
-	ws.Conn.WriteMessage(websocket.TextMessage, res)
+	err = ws.Conn.WriteMessage(websocket.TextMessage, res)
+	if err != nil {
+		ws.Disconnect()
+	}
 }
 
 func (ws *WS) HandleWSMessage(data []byte) {
@@ -62,4 +66,11 @@ func (ws *WS) HandleWSMessage(data []byte) {
 	}
 
 	ws.Handler.Handle(ctx)
+}
+
+func (ws *WS) Disconnect() {
+	if ws.RoomID != "" {
+		ws.Conns.RemoveFromRoom(ws.RoomID, ws.User.ID)
+	}
+	ws.Conn.Close()
 }

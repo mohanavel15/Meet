@@ -39,7 +39,7 @@ func JoinRoom(ctx *ws.Context) {
 	res := models.JOIN_ROOM{RoomID: joinRoom.RoomID}
 	if other_user != nil {
 		res.User = *other_user.User
-		res.IC = other_user.IC
+		res.ICE = other_user.ICE
 		res.State = other_user.State
 	}
 
@@ -51,7 +51,7 @@ func JoinRoom(ctx *ws.Context) {
 func LeaveRoom(ctx *ws.Context) {
 	roomId := ctx.Ws.RoomID
 	ctx.Ws.RoomID = ""
-	ctx.Ws.Conns.RemoveFromRoom(roomId, ctx.Ws)
+	ctx.Ws.Conns.RemoveFromRoom(roomId, ctx.Ws.User.ID)
 	ctx.Ws.Send("LEAVE_ROOM", "")
 	ctx.Ws.Conns.Send(roomId, ctx.Ws.User.ID, "USER_LEAVE", "")
 }
