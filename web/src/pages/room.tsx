@@ -1,110 +1,121 @@
-import { createMediaPermissionRequest, createStream } from "@solid-primitives/stream";
-import { Accessor, createEffect, createSignal, Show } from "solid-js";
-import BottonBar from "../Components/BottonBar";
-import VideoBox from "../Components/VideoBox";
+import { Accessor, createEffect, createSignal, Setter, Show } from "solid-js";
+import createWebsocket from '@solid-primitives/websocket';
+import { createStore } from "solid-js/store";
+
+import URLs from "../config";
 import User from "../Models/User";
+import WSMsg from "../Models/WSMsg";
+import Call from "./room/Call";
+import JoinRoom from "./room/JoinRoom";
+import State from "../Models/State";
+import { useParams } from "@solidjs/router";
 
-const iceservers = {
-    iceServers: [
-      {
-        urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'],
-      },
-    ],
-    iceCandidatePoolSize: 10,
+interface RoomProp {
+    user: Accessor<User>
+    isLoggedIn: Accessor<boolean>
+    setRoomID: Setter<string | undefined>
 }
 
-declare module "solid-js" {
-    namespace JSX {
-        interface ExplicitProperties {
-            srcObject?: MediaStream
+export default function Room(prop: RoomProp) {
+    const params = useParams();
+    const [selfState, setSelfState] = createStore<State>({ muted: false, video: false })
+    const [remoteState, setRemoteState] = createStore<State>({ muted: false, video: false })
+    const [callType, setCallType] = createSignal(0)
+    const [callState, setCallState] = createSignal(0)
+    const [constraints, setConstraints] = createSignal<{ audioInput?: string, videoInput?: string}>({})
+    const [remoteUser, setRemoteUser] = createSignal<User | undefined>()
+    const [remoteICE, setRemoteICE] = createSignal<string | undefined>()
+
+    const onMessage = (msg: MessageEvent) => {
+		const data = msg.data
+		const ws_msg: WSMsg = JSON.parse(data)
+
+		console.log(ws_msg)
+		const event = ws_msg.event
+
+		if (event === "READY") {
+			//setLoading(false)
+
+		} else if (event === "JOIN_ROOM") {
+			const roomID: string = ws_msg.data.room_id
+			const remoteUser: User = ws_msg.data.user
+			const ice_candidate = ws_msg.data.ice_candidate
+            const remoteState: State = ws_msg.data.state
+
+            if (remoteUser.login === "") {
+                setCallType(2)
+            } else {
+                setCallType(1)
+                setRemoteUser(remoteUser)
+                setRemoteState(remoteState)
+                setRemoteICE(ice_candidate)
+            }
+
+			prop.setRoomID(roomID)
+			setCallState(1)
+
+		} else if (event === "LEAVE_ROOM") {
+			setCallState(2)
+            prop.setRoomID(undefined)
+            setRemoteICE(undefined)
+			setRemoteUser(undefined)
+
+		} else if (event === "USER_JOIN") {
+			const remote_user: User = ws_msg.data.user
+            const remoteState: State = ws_msg.data.state
+			setRemoteUser(remote_user)
+            setRemoteState(remoteState)
+
+		} else if (event === "USER_LEAVE") {
+			setRemoteUser(undefined)
+			
+		} else if (event === "ICE_CANDIDATE") {
+			const ric = ws_msg.data
+			setRemoteICE(ric)
+
+		} else if (event === "STATE_UPDATE") {
+            const state: State = ws_msg.data
+            setRemoteState(state)
         }
-    }
-}
+	}
 
-export default function Room({ user, remoteUser, wsSend, type, ric }: { user: Accessor<User>, remoteUser: Accessor<User | undefined>, wsSend: (msg: string) => void, type: number, ric: Accessor<string | undefined>}) {
-    const [selfMuted, setSelfMuted] = createSignal(false)
-    const [selfVideo, setSelfVideo] = createSignal(false)
-    const [remoteMuted, setRemoteMuted] = createSignal(false)
-    const [remoteVideo, setRemoteVideo] = createSignal(false)
-    
-    createMediaPermissionRequest()
-    const [stream, { mutate, stop }] = createStream({ video: selfVideo(), audio: !selfMuted() })
-    const [remoteStream, setRemoteStream] = createSignal<MediaStream>()
-
-    const PeerConnection = new RTCPeerConnection(iceservers)
-    
-    PeerConnection.onicecandidate = () => {
-        wsSend(JSON.stringify({ event: "ICE_CANDIDATE", data: { sdp: JSON.stringify(PeerConnection.localDescription) }}))
-    }
-
-    PeerConnection.ontrack = (event) => {
-        setRemoteStream(event.streams[0])
-    }
+    const [connect, _, wsSend] = createWebsocket(URLs.websocket, onMessage, (e: Event) => {} ,[], 3, 5000);
 
     createEffect(() => {
-        const RawStream = stream()
-        if (RawStream === undefined) return
-        RawStream.getTracks().forEach(track => PeerConnection.addTrack(track, RawStream))
-        if (type === 1 && PeerConnection.localDescription === null) StartCall()
-    })
-
-    async function StartCall() {
-        const offer = await PeerConnection.createOffer()
-        await PeerConnection.setLocalDescription(offer)
-    }
-
-    async function AnswerCall() {
-        const answer = await PeerConnection.createAnswer()
-        await PeerConnection.setLocalDescription(answer)
-    }
-
-    createEffect(async () => {
-        const RawStream = stream()
-        if (RawStream === undefined) return
-        
-        const remote_ice = ric()
-        if (remote_ice === undefined || remote_ice === "") return
-
-        if (PeerConnection.remoteDescription === null) {
-            await PeerConnection.setRemoteDescription(JSON.parse(remote_ice))
-        } else {
-            await PeerConnection.addIceCandidate(JSON.parse(remote_ice))
+        if (prop.isLoggedIn()) {
+            connect()
         }
-
-        if (type === 2 && PeerConnection.localDescription === null) AnswerCall()
     })
 
-    function Mute(bool: boolean) {
-        setSelfMuted(bool)
-        mutate(s => {
-            s?.getAudioTracks().forEach(track => track.enabled = !bool)
-            return s
-        })
-    }
-
-    function Video(bool: boolean) {
-        setSelfVideo(bool)
-        mutate(s => {
-            s?.getVideoTracks().forEach(track => track.enabled = bool)
-            return s
-        })
-    }
-
-    function endCall () {
-        wsSend(JSON.stringify({ event: "LEAVE_ROOM", data: "" }))
-        PeerConnection.close()
-        stop()
+    function JoinCall() {
+        wsSend(JSON.stringify({ event:"JOIN_ROOM", data:{
+            room_id: params.id,
+            state: selfState
+        }}))
     }
     
     return (
-        <div class="flex flex-col w-full h-full items-center">
-            <div class="flex flex-col sm:flex-row h-full items-center justify-center">
-                <Show when={remoteUser() !== undefined}>
-                    <VideoBox video={remoteVideo} self={false} stream={remoteStream} mute={remoteMuted} user={remoteUser} />
-                </Show>
-                <VideoBox video={selfVideo} self={true} stream={stream} mute={selfMuted} user={user} />
-            </div>
-            <BottonBar mute={selfMuted} video={selfVideo} setMute={Mute} setVideo={Video} endCall={endCall} />
+        <div class="flex flex-col w-full h-full justify-center items-center">
+            <Show when={callState() === 0}>
+                <JoinRoom 
+                state={selfState}
+                setState={setSelfState}
+                setConstraints={setConstraints} 
+                JoinCall={JoinCall} />
+            </Show>
+            <Show when={callState() === 1}>
+                <Call 
+                    user={prop.user}
+                    remoteUser={remoteUser}
+                    selfState={selfState}
+                    setSelfState={setSelfState}
+                    remoteState={remoteState}
+                    constraints={constraints()}
+                    wsSend={wsSend}
+                    remoteICE={remoteICE}
+                    type={callType}
+                  />
+            </Show>
         </div>
     )
 }
