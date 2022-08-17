@@ -55,3 +55,13 @@ func LeaveRoom(ctx *ws.Context) {
 	ctx.Ws.Send("LEAVE_ROOM", "")
 	ctx.Ws.Conns.Send(roomId, ctx.Ws.User.ID, "USER_LEAVE", "")
 }
+
+func StateUpdate(ctx *ws.Context) {
+	var data models.State
+	err := json.Unmarshal(ctx.Data, &data)
+	if err != nil {
+		return
+	}
+
+	ctx.Ws.Conns.Send(ctx.Ws.RoomID, ctx.Ws.User.ID, "STATE_UPDATE", data)
+}
