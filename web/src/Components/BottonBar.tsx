@@ -1,22 +1,30 @@
-import { Accessor, createSignal, JSX, Show } from "solid-js"
+import { Accessor, createEffect, createSignal, JSX, Show } from "solid-js"
 import { BiSolidMicrophone, BiSolidMicrophoneOff } from 'solid-icons/bi'
 import { 
     BsCameraVideoFill, 
     BsCameraVideoOffFill,
     BsTelephoneXFill
 } from 'solid-icons/bs'
+import State from "../Models/State"
 
 interface BottonBarProps {
-    mute: Accessor<boolean>
+    state: Accessor<State>
     setMute: (bool: boolean) => void
-    video: Accessor<boolean>
     setVideo: (bool: boolean) => void
     endCall: () => void
 }
 
-export default function BottonBar({ mute, setMute, video, setVideo, endCall }: BottonBarProps) {
+export default function BottonBar({ state, setMute, setVideo, endCall }: BottonBarProps) {
     const [self, _] = createSignal(true)
-    
+    const [video, setvideo] = createSignal(false)
+    const [mute, setmute] = createSignal(false)
+
+    createEffect(() => {
+        const state_ = state()
+        setvideo(state_.video)
+        setmute(state_.muted)
+    })
+
     return (
     <div class="h-12 bg-slate-900 w-full items-center flex px-8 justify-center">
         <ActionButton visible={video} when={false} onclick={() => setVideo(true)}>
