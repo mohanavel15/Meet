@@ -84,7 +84,7 @@ export default function Call(prop: CallProp) {
   })
 
   function Mute(bool: boolean) {
-    prop.setSelfState(p => { p.muted = bool; return p })
+    prop.setSelfState("muted", bool)
     mutate(s => {
       s?.getAudioTracks().forEach(track => track.enabled = !bool)
       return s
@@ -92,7 +92,7 @@ export default function Call(prop: CallProp) {
   }
 
   function Video(bool: boolean) {
-    prop.setSelfState(p => { p.video = bool; return p })
+    prop.setSelfState("video", bool)
     mutate(s => {
       s?.getVideoTracks().forEach(track => track.enabled = bool)
       return s

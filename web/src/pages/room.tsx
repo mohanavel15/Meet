@@ -47,7 +47,8 @@ export default function Room(prop: RoomProp) {
             } else {
                 setCallType(1)
                 setRemoteUser(remoteUser)
-                setRemoteState(remoteState)
+                setRemoteState("muted", remoteState.muted)
+                setRemoteState("video", remoteState.video)
                 setRemoteICE(ice_candidate)
             }
 
@@ -64,7 +65,8 @@ export default function Room(prop: RoomProp) {
 			const remote_user: User = ws_msg.data.user
             const remoteState: State = ws_msg.data.state
 			setRemoteUser(remote_user)
-            setRemoteState(remoteState)
+            setRemoteState("muted", remoteState.muted)
+            setRemoteState("video", remoteState.video)
 
 		} else if (event === "USER_LEAVE") {
 			setRemoteUser(undefined)
@@ -75,7 +77,8 @@ export default function Room(prop: RoomProp) {
 
 		} else if (event === "STATE_UPDATE") {
             const state: State = ws_msg.data
-            setRemoteState(state)
+            setRemoteState("muted", state.muted)
+            setRemoteState("video", state.video)
         }
 	}
 
@@ -86,11 +89,17 @@ export default function Room(prop: RoomProp) {
             connect()
         }
     })
-
+    
+    createEffect(() => {
+        if (callState() === 1) {
+            wsSend(JSON.stringify({ event: "STATE_UPDATE", data:{ muted: selfState.muted, video: selfState.video }}))
+        }
+    })
+    
     function JoinCall() {
         wsSend(JSON.stringify({ event:"JOIN_ROOM", data:{
             room_id: params.id,
-            state: selfState
+            state: { muted: selfState.muted, video: selfState.video }
         }}))
     }
     

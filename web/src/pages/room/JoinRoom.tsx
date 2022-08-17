@@ -2,7 +2,8 @@ import { createCameras, createMicrophones, createSpeakers } from "@solid-primiti
 import { createMediaPermissionRequest } from "@solid-primitives/stream"
 import { BiSolidMicrophone, BiSolidMicrophoneOff } from "solid-icons/bi";
 import { BsCameraVideoFill, BsCameraVideoOffFill } from "solid-icons/bs";
-import { Accessor, createEffect, createSignal, Setter } from "solid-js";
+import { createEffect, createSignal, Setter } from "solid-js";
+import { SetStoreFunction } from "solid-js/store";
 import ActionButton from "../../Components/ActionButton";
 import SelectMediaDevice from "../../Components/SelectMediaDevice";
 import State from "../../Models/State";
@@ -12,12 +13,12 @@ interface JoinRoomProp {
         audioInput?: string;
         videoInput?: string;
     }>
-    selfState: Accessor<State>
-    setSelfState: Setter<State>
+    state: State
+    setState: SetStoreFunction<State>
     JoinCall: () => void
 }
 
-export default function JoinRoom({ selfState, setSelfState, setConstraints, JoinCall }: JoinRoomProp) {
+export default function JoinRoom({ state, setState, setConstraints, JoinCall }: JoinRoomProp) {
     createMediaPermissionRequest('audio');
     createMediaPermissionRequest('video');
     const microphones = createMicrophones();
@@ -27,19 +28,17 @@ export default function JoinRoom({ selfState, setSelfState, setConstraints, Join
     const [video, setvideo] = createSignal(false)
     
     createEffect(() => {
-        // for some reason it's not re-running when state changes. will fix later 
-        const state_ = selfState()
-        setvideo(state_.video)
-        setmute(state_.muted)
+        setvideo(state.video)
+        setmute(state.muted)
         console.log("State Changed")
     })
 
     function setMute(bool: boolean) {
-        setSelfState(p => { p.muted = bool; return p })
+        setState("muted", bool)
     }
 
     function setVideo(bool: boolean) {
-        setSelfState(p => { p.muted = bool; return p })
+        setState("video", bool)
     }
 
     return (
