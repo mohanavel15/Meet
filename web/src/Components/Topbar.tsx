@@ -1,3 +1,4 @@
+import { Link } from "@solidjs/router";
 import { Accessor, createSignal, Show } from "solid-js";
 import URLs from "../config";
 import User from "../Models/User";
@@ -7,7 +8,9 @@ export default function Topbar({ user, isLoggedIn, roomID }: { user: Accessor<Us
     
     return (
     <div class="h-12 bg-slate-900 w-full items-center flex px-8 justify-between">
-        <span class="text-xl font-bold">Meet</span>
+        <Link href="/">
+            <span class="text-xl font-bold">Meet</span>
+        </Link>
         <Show when={roomID() !== undefined}>
         <span>Room ID: {roomID()}</span>
         </Show>

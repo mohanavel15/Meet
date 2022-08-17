@@ -2,7 +2,7 @@
 
 2 person Video/Audio call app built with Go Fiber, Solid JS, TailwindCSS and uses github oauth.
 
-#### It works but needs refactoring and only tested in localhost
+#### Its bugy and needs refactoring and only works in localhost
 
 ## To Run
 
@@ -30,7 +30,7 @@ source .env
 
 ### Client
 
-Chnage `oauth_url` in `/web/src/Components/Topbar.tsx`
+Change `oauth_url` in `/web/src/Components/Topbar.tsx`
 
 `cd web`
 
