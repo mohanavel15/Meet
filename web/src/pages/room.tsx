@@ -20,9 +20,9 @@ export default function Room(prop: RoomProp) {
     const params = useParams();
     const [selfState, setSelfState] = createStore<State>({ muted: false, video: false })
     const [remoteState, setRemoteState] = createStore<State>({ muted: false, video: false })
+    const [constraints, setConstraints] = createStore<{ audioInput?: string, videoInput?: string}>({})
     const [callType, setCallType] = createSignal(0)
     const [callState, setCallState] = createSignal(0)
-    const [constraints, setConstraints] = createSignal<{ audioInput?: string, videoInput?: string}>({})
     const [remoteUser, setRemoteUser] = createSignal<User | undefined>()
     const [remoteICE, setRemoteICE] = createSignal<string | undefined>()
 
@@ -56,7 +56,7 @@ export default function Room(prop: RoomProp) {
 			setCallState(1)
 
 		} else if (event === "LEAVE_ROOM") {
-			setCallState(2)
+			setCallState(0)
             prop.setRoomID(undefined)
             setRemoteICE(undefined)
 			setRemoteUser(undefined)
@@ -119,7 +119,7 @@ export default function Room(prop: RoomProp) {
                     selfState={selfState}
                     setSelfState={setSelfState}
                     remoteState={remoteState}
-                    constraints={constraints()}
+                    constraints={constraints}
                     wsSend={wsSend}
                     remoteICE={remoteICE}
                     type={callType}

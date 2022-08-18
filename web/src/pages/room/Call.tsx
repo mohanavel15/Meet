@@ -39,11 +39,17 @@ export default function Call(prop: CallProp) {
   
   const [stream, { mutate, stop }] = createStream(constraints)
   const [remoteStream, setRemoteStream] = createSignal<MediaStream>()
+  createEffect(() => {
+    const RawStream = stream()
+    if (RawStream === undefined) return
+    mutate(s => { s?.getAudioTracks().forEach(track => track.enabled = !prop.selfState.muted); return s })
+    mutate(s => { s?.getVideoTracks().forEach(track => track.enabled = prop.selfState.video); return s })
+  })
 
   const PeerConnection = new RTCPeerConnection(iceservers)
 
   PeerConnection.onicecandidate = () => {
-    prop.wsSend(JSON.stringify({ event: "ICE_CANDIDATE", data: { sdp: JSON.stringify(PeerConnection.localDescription) } }))
+    prop.wsSend(JSON.stringify({ event: "ICE_CANDIDATE", data: { ice: JSON.stringify(PeerConnection.localDescription) } }))
   }
 
   PeerConnection.ontrack = (event) => {
@@ -83,22 +89,6 @@ export default function Call(prop: CallProp) {
     if (prop.type() === 2 && PeerConnection.localDescription === null) AnswerCall()
   })
 
-  function Mute(bool: boolean) {
-    prop.setSelfState("muted", bool)
-    mutate(s => {
-      s?.getAudioTracks().forEach(track => track.enabled = !bool)
-      return s
-    })
-  }
-
-  function Video(bool: boolean) {
-    prop.setSelfState("video", bool)
-    mutate(s => {
-      s?.getVideoTracks().forEach(track => track.enabled = bool)
-      return s
-    })
-  }
-
   function endCall() {
     prop.wsSend(JSON.stringify({ event: "LEAVE_ROOM", data: "" }))
     PeerConnection.close()
@@ -113,7 +103,7 @@ export default function Call(prop: CallProp) {
         </Show>
         <VideoBox state={prop.selfState} self={true} stream={stream} user={prop.user} />
       </div>
-      <BottonBar state={prop.selfState} setMute={Mute} setVideo={Video} endCall={endCall} />
+      <BottonBar state={prop.selfState} setMute={(b) => prop.setSelfState("muted", b)} setVideo={(b) => prop.setSelfState("video", b)} endCall={endCall} />
     </div>
   )
 }

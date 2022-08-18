@@ -9,9 +9,9 @@ import SelectMediaDevice from "../../Components/SelectMediaDevice";
 import State from "../../Models/State";
 
 interface JoinRoomProp {
-    setConstraints: Setter<{
-        audioInput?: string;
-        videoInput?: string;
+    setConstraints: SetStoreFunction<{
+        audioInput?: string | undefined;
+        videoInput?: string | undefined;
     }>
     state: State
     setState: SetStoreFunction<State>
@@ -44,8 +44,8 @@ export default function JoinRoom({ state, setState, setConstraints, JoinCall }: 
     return (
         <div class="pb-6 w-1/4 bg-gray-900 rounded-xl flex flex-col items-center">
             <div class="w-full">
-            <SelectMediaDevice title="Select Audio Input :" devices={microphones} onClick={e => setConstraints(p => { p.audioInput = e.currentTarget.value; return p })} />
-            <SelectMediaDevice title="Select Video Input :" devices={cameras} onClick={e => setConstraints(p => { p.videoInput = e.currentTarget.value; return p })} />
+            <SelectMediaDevice title="Select Audio Input :" devices={microphones} onClick={e => setConstraints("audioInput",e.currentTarget.value)} />
+            <SelectMediaDevice title="Select Video Input :" devices={cameras} onClick={e => setConstraints("videoInput",e.currentTarget.value)} />
             </div>
             <div class="flex">
                 <ActionButton visible={video} when={false} onclick={() => setVideo(true)}>
@@ -53,7 +53,7 @@ export default function JoinRoom({ state, setState, setConstraints, JoinCall }: 
                 </ActionButton>
                 
                 <ActionButton visible={video} when={true} onclick={() => setVideo(false)}>
-                <BsCameraVideoOffFill size={20} color="#E60000"/>
+                <BsCameraVideoFill size={20} color="#E60000" />
                 </ActionButton>
                 
                 <ActionButton visible={mute} when={false} onclick={() => setMute(true)}>

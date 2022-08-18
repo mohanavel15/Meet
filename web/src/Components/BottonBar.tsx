@@ -32,7 +32,7 @@ export default function BottonBar({ state, setMute, setVideo, endCall }: BottonB
         </ActionButton>
         
         <ActionButton visible={video} when={true} onclick={() => setVideo(false)}>
-        <BsCameraVideoOffFill size={20} color="#E60000"/>
+        <BsCameraVideoFill size={20} color="#E60000" />
         </ActionButton>
         
         <ActionButton visible={mute} when={false} onclick={() => setMute(true)}>
