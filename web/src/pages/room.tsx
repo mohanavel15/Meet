@@ -24,7 +24,8 @@ export default function Room(prop: RoomProp) {
     const [callType, setCallType] = createSignal(0)
     const [callState, setCallState] = createSignal(0)
     const [remoteUser, setRemoteUser] = createSignal<User | undefined>()
-    const [remoteICE, setRemoteICE] = createSignal<string | undefined>()
+    const [SessionDescription, setSessionDescription] = createSignal<RTCSessionDescriptionInit | undefined>()
+    const [remoteICE, setRemoteICE] = createSignal<RTCIceCandidate[]>([])
 
     const onMessage = (msg: MessageEvent) => {
 		const data = msg.data
@@ -39,17 +40,20 @@ export default function Room(prop: RoomProp) {
 		} else if (event === "JOIN_ROOM") {
 			const roomID: string = ws_msg.data.room_id
 			const remoteUser: User = ws_msg.data.user
-			const ice_candidate = ws_msg.data.ice_candidate
+			const ice_candidate: RTCIceCandidate[] = ws_msg.data.ice_candidate
+			const session_description: RTCSessionDescriptionInit = ws_msg.data.session_description
             const remoteState: State = ws_msg.data.state
 
             if (remoteUser.login === "") {
-                setCallType(2)
-            } else {
                 setCallType(1)
+
+            } else {
+                setCallType(2)
                 setRemoteUser(remoteUser)
                 setRemoteState("muted", remoteState.muted)
                 setRemoteState("video", remoteState.video)
-                setRemoteICE(ice_candidate)
+                setSessionDescription(session_description)
+                setRemoteICE(p => [...p, ...ice_candidate])
             }
 
 			prop.setRoomID(roomID)
@@ -58,7 +62,7 @@ export default function Room(prop: RoomProp) {
 		} else if (event === "LEAVE_ROOM") {
 			setCallState(0)
             prop.setRoomID(undefined)
-            setRemoteICE(undefined)
+            setRemoteICE([])
 			setRemoteUser(undefined)
 
 		} else if (event === "USER_JOIN") {
@@ -71,8 +75,12 @@ export default function Room(prop: RoomProp) {
 		} else if (event === "USER_LEAVE") {
 			setRemoteUser(undefined)
 			
+		} else if (event === "SESSION_DESCRIPTION") {
+			const session_description: RTCSessionDescriptionInit = ws_msg.data
+			setSessionDescription(session_description)
+
 		} else if (event === "ICE_CANDIDATE") {
-			const ric = ws_msg.data
+			const ric: RTCIceCandidate[] = ws_msg.data
 			setRemoteICE(ric)
 
 		} else if (event === "STATE_UPDATE") {
@@ -121,6 +129,7 @@ export default function Room(prop: RoomProp) {
                     remoteState={remoteState}
                     constraints={constraints}
                     wsSend={wsSend}
+                    SessionDescription={SessionDescription}
                     remoteICE={remoteICE}
                     type={callType}
                   />

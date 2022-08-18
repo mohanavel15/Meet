@@ -26,7 +26,8 @@ interface CallProp {
   setSelfState: SetStoreFunction<State>
   remoteState: State
   wsSend: (message: string) => void
-  remoteICE: Accessor<string | undefined>
+  remoteICE: Accessor<RTCIceCandidate[]>
+  SessionDescription: Accessor<RTCSessionDescriptionInit | undefined>
   type: Accessor<number>
 }
 
@@ -39,6 +40,8 @@ export default function Call(prop: CallProp) {
   
   const [stream, { mutate, stop }] = createStream(constraints)
   const [remoteStream, setRemoteStream] = createSignal<MediaStream>()
+  const [hasSessionDescription, setHasSessionDescription] = createSignal(false)
+
   createEffect(() => {
     const RawStream = stream()
     if (RawStream === undefined) return
@@ -48,8 +51,8 @@ export default function Call(prop: CallProp) {
 
   const PeerConnection = new RTCPeerConnection(iceservers)
 
-  PeerConnection.onicecandidate = () => {
-    prop.wsSend(JSON.stringify({ event: "ICE_CANDIDATE", data: { ice: JSON.stringify(PeerConnection.localDescription) } }))
+  PeerConnection.onicecandidate = (event) => {
+    prop.wsSend(JSON.stringify({ event: "ICE_CANDIDATE", data: event.candidate  }))
   }
 
   PeerConnection.ontrack = (event) => {
@@ -66,27 +69,39 @@ export default function Call(prop: CallProp) {
   async function StartCall() {
     const offer = await PeerConnection.createOffer()
     await PeerConnection.setLocalDescription(offer)
+    prop.wsSend(JSON.stringify({ event: "SESSION_DESCRIPTION", data: offer }))
   }
 
   async function AnswerCall() {
     const answer = await PeerConnection.createAnswer()
     await PeerConnection.setLocalDescription(answer)
+    prop.wsSend(JSON.stringify({ event: "SESSION_DESCRIPTION", data: answer }))
   }
 
   createEffect(async () => {
     const RawStream = stream()
     if (RawStream === undefined) return
 
-    const remote_ice = prop.remoteICE()
-    if (remote_ice === undefined || remote_ice === "") return
+    const session_description = prop.SessionDescription()
+    if (session_description === undefined) return
 
-    if (PeerConnection.remoteDescription === null) {
-      await PeerConnection.setRemoteDescription(JSON.parse(remote_ice))
-    } else {
-      await PeerConnection.addIceCandidate(JSON.parse(remote_ice))
+    if (!hasSessionDescription()) {
+      await PeerConnection.setRemoteDescription(session_description)
+      setHasSessionDescription(true)
+      if (prop.type() === 2 && PeerConnection.localDescription === null) AnswerCall()
     }
+  })
 
-    if (prop.type() === 2 && PeerConnection.localDescription === null) AnswerCall()
+  createEffect(async () => {
+    const has_session_description = hasSessionDescription()
+    if (!has_session_description) return
+    
+    const remote_ice = prop.remoteICE()
+    if (remote_ice.length === 0) return
+
+    remote_ice.forEach(async ice => {
+      await PeerConnection.addIceCandidate(ice)
+    })
   })
 
   function endCall() {

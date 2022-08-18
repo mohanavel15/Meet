@@ -10,13 +10,14 @@ import (
 )
 
 type WS struct {
-	User    *models.User
-	State   models.State
-	Conn    *websocket.Conn
-	Conns   *Connections
-	Handler *EventHandler
-	ICE     string
-	RoomID  string
+	User               *models.User
+	State              models.State
+	Conn               *websocket.Conn
+	Conns              *Connections
+	Handler            *EventHandler
+	SessionDescription models.SessionDescription
+	ICE                []models.IceCandidate
+	RoomID             string
 }
 
 func (ws *WS) ReadLoop() {

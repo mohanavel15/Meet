@@ -34,6 +34,7 @@ func main() {
 	eventhandler.On("JOIN_ROOM", gateway.JoinRoom)
 	eventhandler.On("LEAVE_ROOM", gateway.LeaveRoom)
 	eventhandler.On("ICE_CANDIDATE", gateway.IceCandidate)
+	eventhandler.On("SESSION_DESCRIPTION", gateway.SessionDescription)
 	eventhandler.On("STATE_UPDATE", gateway.StateUpdate)
 
 	log.Fatal(app.Listen(":" + PORT))

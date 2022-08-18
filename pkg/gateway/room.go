@@ -40,6 +40,7 @@ func JoinRoom(ctx *ws.Context) {
 	if other_user != nil {
 		res.User = *other_user.User
 		res.ICE = other_user.ICE
+		res.SessionDescription = other_user.SessionDescription
 		res.State = other_user.State
 	}
 
