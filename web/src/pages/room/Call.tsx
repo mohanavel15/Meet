@@ -1,5 +1,5 @@
 import { createStream } from "@solid-primitives/stream"
-import { Accessor, createEffect, createSignal, Setter, Show } from "solid-js"
+import { Accessor, createEffect, createSignal, onCleanup, Setter, Show } from "solid-js"
 import { SetStoreFunction } from "solid-js/store"
 import BottonBar from "../../Components/BottonBar"
 import VideoBox from "../../Components/VideoBox"
@@ -106,9 +106,14 @@ export default function Call(prop: CallProp) {
 
   function endCall() {
     prop.wsSend(JSON.stringify({ event: "LEAVE_ROOM", data: "" }))
+  }
+
+  onCleanup(() => {
     PeerConnection.close()
     stop()
-  }
+    setRemoteStream(undefined)
+    setHasSessionDescription(false)
+  })
 
   return (
     <div class="flex flex-col w-full h-full items-center">

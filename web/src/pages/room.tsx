@@ -27,6 +27,13 @@ export default function Room(prop: RoomProp) {
     const [SessionDescription, setSessionDescription] = createSignal<RTCSessionDescriptionInit | undefined>()
     const [remoteICE, setRemoteICE] = createSignal<RTCIceCandidate[]>([])
 
+    const CleanUpRemote = () => {
+        setRemoteUser(undefined)
+        setSessionDescription(undefined)
+        setRemoteICE([])
+        setRemoteState({ muted: false, video: false })
+    }
+    
     const onMessage = (msg: MessageEvent) => {
 		const data = msg.data
 		const ws_msg: WSMsg = JSON.parse(data)
@@ -60,10 +67,10 @@ export default function Room(prop: RoomProp) {
 			setCallState(1)
 
 		} else if (event === "LEAVE_ROOM") {
-			setCallState(0)
             prop.setRoomID(undefined)
-            setRemoteICE([])
-			setRemoteUser(undefined)
+            setCallType(0)
+			setCallState(0)
+            CleanUpRemote()
 
 		} else if (event === "USER_JOIN") {
 			const remote_user: User = ws_msg.data.user
@@ -73,7 +80,7 @@ export default function Room(prop: RoomProp) {
             setRemoteState("video", remoteState.video)
 
 		} else if (event === "USER_LEAVE") {
-			setRemoteUser(undefined)
+            CleanUpRemote()
 			
 		} else if (event === "SESSION_DESCRIPTION") {
 			const session_description: RTCSessionDescriptionInit = ws_msg.data

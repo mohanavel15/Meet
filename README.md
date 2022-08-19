@@ -1,8 +1,8 @@
 # Meet
 
-2 person Video/Audio call app built with Go Fiber, Solid JS, TailwindCSS and uses github oauth.
+ One-To-One Video/Audio call app built with WebRTC, Go Fiber, Solid JS, TailwindCSS and uses github oauth.
 
-#### Its bugy and needs refactoring and only works in localhost
+#### Its bugy and needs refactoring but fully works with remote users
 
 ## To Run
 
