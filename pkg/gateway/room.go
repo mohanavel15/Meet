@@ -6,17 +6,14 @@ import (
 	"encoding/json"
 )
 
-type RoomID struct {
-	RoomID string       `json:"room_id"`
-	State  models.State `json:"state"`
-}
-
 func JoinRoom(ctx *ws.Context) {
-	var joinRoom RoomID
+	var joinRoom models.JOIN_ROOM
 	err := json.Unmarshal(ctx.Data, &joinRoom)
 	if err != nil {
 		return
 	}
+
+	ctx.Ws.State = joinRoom.State
 
 	room, ok := ctx.Ws.Conns.GetRoom(joinRoom.RoomID)
 	if !ok {

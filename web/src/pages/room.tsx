@@ -68,8 +68,8 @@ export default function Room(prop: RoomProp) {
 
 		} else if (event === "LEAVE_ROOM") {
             prop.setRoomID(undefined)
-            setCallType(0)
 			setCallState(0)
+            setCallType(0)
             CleanUpRemote()
 
 		} else if (event === "USER_JOIN") {
