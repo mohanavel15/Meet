@@ -9,6 +9,7 @@ import Call from "./room/Call";
 import JoinRoom from "./room/JoinRoom";
 import State from "../Models/State";
 import { useParams } from "@solidjs/router";
+import Loader from "../Components/Loader";
 
 interface RoomProp {
     user: Accessor<User>
@@ -26,6 +27,7 @@ export default function Room(prop: RoomProp) {
     const [remoteUser, setRemoteUser] = createSignal<User | undefined>()
     const [SessionDescription, setSessionDescription] = createSignal<RTCSessionDescriptionInit | undefined>()
     const [remoteICE, setRemoteICE] = createSignal<RTCIceCandidate[]>([])
+    const [loading, setLoading] = createSignal(true)
 
     const CleanUpRemote = () => {
         setRemoteUser(undefined)
@@ -42,7 +44,7 @@ export default function Room(prop: RoomProp) {
 		const event = ws_msg.event
 
 		if (event === "READY") {
-			//setLoading(false)
+			setLoading(false)
 
 		} else if (event === "JOIN_ROOM") {
 			const roomID: string = ws_msg.data.room_id
@@ -120,26 +122,31 @@ export default function Room(prop: RoomProp) {
     
     return (
         <div class="flex flex-col w-full h-full justify-center items-center">
-            <Show when={callState() === 0}>
-                <JoinRoom 
-                state={selfState}
-                setState={setSelfState}
-                setConstraints={setConstraints} 
-                JoinCall={JoinCall} />
+            <Show when={!loading()}>
+                <Show when={callState() === 0}>
+                    <JoinRoom 
+                    state={selfState}
+                    setState={setSelfState}
+                    setConstraints={setConstraints} 
+                    JoinCall={JoinCall} />
+                </Show>
+                <Show when={callState() === 1}>
+                    <Call 
+                        user={prop.user}
+                        remoteUser={remoteUser}
+                        selfState={selfState}
+                        setSelfState={setSelfState}
+                        remoteState={remoteState}
+                        constraints={constraints}
+                        wsSend={wsSend}
+                        SessionDescription={SessionDescription}
+                        remoteICE={remoteICE}
+                        type={callType}
+                        />
+                </Show>
             </Show>
-            <Show when={callState() === 1}>
-                <Call 
-                    user={prop.user}
-                    remoteUser={remoteUser}
-                    selfState={selfState}
-                    setSelfState={setSelfState}
-                    remoteState={remoteState}
-                    constraints={constraints}
-                    wsSend={wsSend}
-                    SessionDescription={SessionDescription}
-                    remoteICE={remoteICE}
-                    type={callType}
-                  />
+            <Show when={loading()}>
+                <Loader />
             </Show>
         </div>
     )
