@@ -12,7 +12,7 @@ export default function Topbar({ user, isLoggedIn, roomID }: { user: Accessor<Us
             <span class="text-xl font-bold">Meet</span>
         </Link>
         <Show when={roomID() !== undefined}>
-        <span>Room ID: {roomID()}</span>
+        <span class="hidden md:block">Room ID: {roomID()}</span>
         </Show>
         <Show when={isLoggedIn()}>
             <div class="relative h-8 w-8 hover:cursor-pointer" onclick={() => setShowLogOut(p => !p)}>

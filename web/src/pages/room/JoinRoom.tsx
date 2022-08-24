@@ -1,8 +1,8 @@
-import { createCameras, createMicrophones, createSpeakers } from "@solid-primitives/devices";
+import { createCameras, createMicrophones } from "@solid-primitives/devices";
 import { createMediaPermissionRequest } from "@solid-primitives/stream"
 import { BiSolidMicrophone, BiSolidMicrophoneOff } from "solid-icons/bi";
-import { BsCameraVideoFill, BsCameraVideoOffFill } from "solid-icons/bs";
-import { createEffect, createSignal, Setter } from "solid-js";
+import { BsCameraVideoFill } from "solid-icons/bs";
+import { createEffect, createSignal } from "solid-js";
 import { SetStoreFunction } from "solid-js/store";
 import ActionButton from "../../Components/ActionButton";
 import SelectMediaDevice from "../../Components/SelectMediaDevice";
@@ -30,7 +30,6 @@ export default function JoinRoom({ state, setState, setConstraints, JoinCall }: 
     createEffect(() => {
         setvideo(state.video)
         setmute(state.muted)
-        console.log("State Changed")
     })
 
     function setMute(bool: boolean) {
@@ -42,7 +41,7 @@ export default function JoinRoom({ state, setState, setConstraints, JoinCall }: 
     }
 
     return (
-        <div class="pb-6 w-1/4 bg-gray-900 rounded-xl flex flex-col items-center">
+        <div class="pb-6 w-11/12 sm:w-1/2 xl:w-1/4  bg-gray-900 rounded-xl flex flex-col items-center">
             <div class="w-full">
             <SelectMediaDevice title="Select Audio Input :" devices={microphones} onClick={e => setConstraints("audioInput",e.currentTarget.value)} />
             <SelectMediaDevice title="Select Video Input :" devices={cameras} onClick={e => setConstraints("videoInput",e.currentTarget.value)} />
