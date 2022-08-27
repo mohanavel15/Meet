@@ -4,6 +4,7 @@ import { Route, Routes, useNavigate } from "@solidjs/router";
 import Topbar from "./Components/Topbar";
 import User from "./Models/User";
 import Loader from "./Components/Loader";
+import Welcome from "./pages/welcome";
 
 const Home = lazy(() => import("./pages/home"));
 const Room = lazy(() => import("./pages/room"));
@@ -42,11 +43,16 @@ const App: Component = () => {
 		<div class="text-white flex flex-col items-center bg-gray-800 h-screen w-full">
 			<Show when={!loading()}>
 				<Topbar user={User} isLoggedIn={isLoggedIn} roomID={roomID} />
-				<Routes>
-					<Route path="/" element={<Home onCreate={CreateRoom} onJoin={JoinRoom} isLoggedIn={isLoggedIn} />} />
-					<Route path="/rooms/:id" element={<Room user={User} isLoggedIn={isLoggedIn} setRoomID={setRoomID} />} />
-					<Route path="*" component={PageNotFound} />
-				</Routes>
+				<Show when={isLoggedIn()}>
+					<Routes>
+						<Route path="/" element={<Home onCreate={CreateRoom} onJoin={JoinRoom} isLoggedIn={isLoggedIn} />} />
+						<Route path="/rooms/:id" element={<Room user={User} isLoggedIn={isLoggedIn} setRoomID={setRoomID} />} />
+						<Route path="*" component={PageNotFound} />
+					</Routes>
+				</Show>
+				<Show when={!isLoggedIn()}>
+					<Welcome />
+				</Show>
 			</Show>
 			<Show when={loading()}>
 				<Loader />
