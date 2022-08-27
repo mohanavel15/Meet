@@ -1,8 +1,11 @@
 # Meet
 
- One-To-One Video/Audio call app built with WebRTC, Go Fiber, Solid JS, TailwindCSS and uses github oauth.
+One-To-One Video/Audio call app built with WebRTC, Go Fiber, Solid JS, TailwindCSS and uses github oauth.
 
-#### Its bugy and needs refactoring but fully works with remote users
+## Images
+![home](images/home.png)
+![join](images/join_screen.png)
+![call](images/call.png)
 
 ## To Run
 
