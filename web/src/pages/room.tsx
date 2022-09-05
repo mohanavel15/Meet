@@ -1,6 +1,7 @@
 import { Accessor, createEffect, createSignal, Setter, Show } from "solid-js";
 import createWebsocket from '@solid-primitives/websocket';
 import { createStore } from "solid-js/store";
+import { useParams } from "@solidjs/router";
 
 import URLs from "../config";
 import User from "../Models/User";
@@ -8,7 +9,6 @@ import WSMsg from "../Models/WSMsg";
 import Call from "./room/Call";
 import JoinRoom from "./room/JoinRoom";
 import State from "../Models/State";
-import { useParams } from "@solidjs/router";
 import Loader from "../Components/Loader";
 
 interface RoomProp {

@@ -47,19 +47,19 @@ export default function JoinRoom(prop: JoinRoomProp) {
             <SelectMediaDevice title="Select Video Input :" devices={cameras} onClick={e => prop.setConstraints("videoInput",e.currentTarget.value)} />
             </div>
             <div class="flex">
-                <ActionButton visible={video} when={false} onclick={() => setVideo(true)}>
+                <ActionButton visible={video()} when={false} onclick={() => setVideo(true)}>
                 <BsCameraVideoFill size={20} color="#000000" />
                 </ActionButton>
                 
-                <ActionButton visible={video} when={true} onclick={() => setVideo(false)}>
+                <ActionButton visible={video()} when={true} onclick={() => setVideo(false)}>
                 <BsCameraVideoFill size={20} color="#E60000" />
                 </ActionButton>
                 
-                <ActionButton visible={mute} when={false} onclick={() => setMute(true)}>
+                <ActionButton visible={mute()} when={false} onclick={() => setMute(true)}>
                 <BiSolidMicrophone size={20} color="#000000"/>
                 </ActionButton>
                 
-                <ActionButton visible={mute} when={true} onclick={() => setMute(false)} >
+                <ActionButton visible={mute()} when={true} onclick={() => setMute(false)} >
                 <BiSolidMicrophoneOff size={20} color="#E60000"/>
                 </ActionButton>
             </div>

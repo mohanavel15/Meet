@@ -42,7 +42,7 @@ const App: Component = () => {
 	return (
 		<div class="text-white flex flex-col items-center bg-gray-800 h-screen w-full">
 			<Show when={!loading()}>
-				<Topbar user={User} isLoggedIn={isLoggedIn} roomID={roomID} />
+				<Topbar user={User} isLoggedIn={isLoggedIn()} roomID={roomID} />
 				<Show when={isLoggedIn()}>
 					<Routes>
 						<Route path="/" element={<Home onCreate={CreateRoom} onJoin={JoinRoom} />} />

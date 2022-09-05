@@ -3,7 +3,13 @@ import { Accessor, createSignal, Show } from "solid-js";
 import URLs from "../config";
 import User from "../Models/User";
 
-export default function Topbar(prop: { user: Accessor<User>, isLoggedIn: Accessor<boolean>, roomID: Accessor<string | undefined> }) {
+interface TopbarProp { 
+    user: Accessor<User>, 
+    isLoggedIn: boolean,
+    roomID: Accessor<string | undefined>
+}
+
+export default function Topbar(prop: TopbarProp) {
     const [showLogOut, setShowLogOut] = createSignal(false)
     
     return (
@@ -14,7 +20,7 @@ export default function Topbar(prop: { user: Accessor<User>, isLoggedIn: Accesso
         <Show when={prop.roomID() !== undefined}>
         <span class="hidden md:block">Room ID: {prop.roomID()}</span>
         </Show>
-        <Show when={prop.isLoggedIn()}>
+        <Show when={prop.isLoggedIn}>
             <div class="relative h-8 w-8 hover:cursor-pointer" onclick={() => setShowLogOut(p => !p)}>
                 <img 
                 src={prop.user().avatar_url} 
@@ -33,7 +39,7 @@ export default function Topbar(prop: { user: Accessor<User>, isLoggedIn: Accesso
                 </Show>
             </div>
         </Show>
-        <Show when={!prop.isLoggedIn()}>
+        <Show when={!prop.isLoggedIn}>
             <a class="px-3 py-1 rounded-md bg-black" href={URLs.oauth_url}>Login</a>
         </Show>
     </div>

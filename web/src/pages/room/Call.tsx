@@ -1,7 +1,7 @@
 import { createStream } from "@solid-primitives/stream"
 import { Accessor, createEffect, createSignal, onCleanup, Show } from "solid-js"
 import { SetStoreFunction } from "solid-js/store"
-import BottonBar from "../../Components/BottonBar"
+import BottomBar from "../../Components/BottomBar"
 import VideoBox from "../../Components/VideoBox"
 import State from "../../Models/State"
 import User from "../../Models/User"
@@ -123,7 +123,7 @@ export default function Call(prop: CallProp) {
         </Show>
         <VideoBox state={prop.selfState} self={true} stream={stream} user={prop.user} />
       </div>
-      <BottonBar state={prop.selfState} setMute={(b) => prop.setSelfState("muted", b)} setVideo={(b) => prop.setSelfState("video", b)} endCall={endCall} />
+      <BottomBar state={prop.selfState} setMute={(b) => prop.setSelfState("muted", b)} setVideo={(b) => prop.setSelfState("video", b)} endCall={endCall} />
     </div>
   )
 }
