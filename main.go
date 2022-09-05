@@ -25,9 +25,10 @@ func main() {
 	app := fiber.New()
 
 	app.Get("/api/auth/callback", restapi.Oauth)
+	app.Get("/api/logout", restapi.Logout)
 	app.Get("/api/user", restapi.GetUser)
-	app.Post("/api/rooms", restapi.CreateRoom(connections))
 	app.Get("/api/ws", websocket.New(Gateway))
+	app.Post("/api/rooms", restapi.CreateRoom(connections))
 	app.Static("/assets", "./web/dist/assets")
 	app.Static("*", "./web/dist/index.html")
 

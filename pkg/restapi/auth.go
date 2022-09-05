@@ -27,3 +27,14 @@ func Oauth(ctx *fiber.Ctx) error {
 	ctx.Cookie(cookie)
 	return ctx.Redirect("/")
 }
+
+func Logout(ctx *fiber.Ctx) error {
+	cookie := new(fiber.Cookie)
+	cookie.Name = "access_token"
+	cookie.Value = ""
+	cookie.Expires = time.Now().Add(-1 * time.Second)
+	cookie.HTTPOnly = true
+	cookie.Secure = false
+	ctx.Cookie(cookie)
+	return ctx.SendStatus(http.StatusOK)
+}

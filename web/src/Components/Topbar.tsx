@@ -11,6 +11,13 @@ interface TopbarProp {
 
 export default function Topbar(prop: TopbarProp) {
     const [showLogOut, setShowLogOut] = createSignal(false)
+
+    async function Logout() {
+        const response = await fetch("/api/logout")
+        if (response.ok) {
+            window.location.reload();
+        }
+    }
     
     return (
     <div class="h-12 bg-slate-900 w-full items-center flex px-8 justify-between">
@@ -34,7 +41,7 @@ export default function Topbar(prop: TopbarProp) {
                     <span>{prop.user().name}</span>
                     </div>
                     <div class="w-8"></div>
-                    <button class="text-red-700">Logout</button>
+                    <button class="text-red-700" onclick={Logout}>Logout</button>
                 </div>
                 </Show>
             </div>

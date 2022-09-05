@@ -12,29 +12,21 @@ interface BottomBarProps {
 }
 
 export default function BottomBar(prop: BottomBarProps) {
-    const [video, setvideo] = createSignal(false)
-    const [mute, setmute] = createSignal(false)
-
-    createEffect(() => {
-        setvideo(prop.state.video)
-        setmute(prop.state.muted)
-    })
-
     return (
     <div class="h-12 bg-slate-900 w-full items-center flex px-8 justify-center">
-        <ActionButton visible={video()} when={false} onclick={() => prop.setVideo(true)}>
+        <ActionButton visible={prop.state.video} when={false} onclick={() => prop.setVideo(true)}>
         <BsCameraVideoFill size={20} color="#000000" />
         </ActionButton>
         
-        <ActionButton visible={video()} when={true} onclick={() => prop.setVideo(false)}>
+        <ActionButton visible={prop.state.video} when={true} onclick={() => prop.setVideo(false)}>
         <BsCameraVideoFill size={20} color="#E60000" />
         </ActionButton>
         
-        <ActionButton visible={mute()} when={false} onclick={() => prop.setMute(true)}>
+        <ActionButton visible={prop.state.muted} when={false} onclick={() => prop.setMute(true)}>
         <BiSolidMicrophone size={20} color="#000000"/>
         </ActionButton>
         
-        <ActionButton visible={mute()} when={true} onclick={() => prop.setMute(false)} >
+        <ActionButton visible={prop.state.muted} when={true} onclick={() => prop.setMute(false)} >
         <BiSolidMicrophoneOff size={20} color="#E60000"/>
         </ActionButton>
         
