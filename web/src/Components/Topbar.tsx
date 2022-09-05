@@ -3,7 +3,7 @@ import { Accessor, createSignal, Show } from "solid-js";
 import URLs from "../config";
 import User from "../Models/User";
 
-export default function Topbar({ user, isLoggedIn, roomID }: { user: Accessor<User>, isLoggedIn: Accessor<boolean>, roomID: Accessor<string | undefined> }) {
+export default function Topbar(prop: { user: Accessor<User>, isLoggedIn: Accessor<boolean>, roomID: Accessor<string | undefined> }) {
     const [showLogOut, setShowLogOut] = createSignal(false)
     
     return (
@@ -11,13 +11,13 @@ export default function Topbar({ user, isLoggedIn, roomID }: { user: Accessor<Us
         <Link href="/">
             <span class="text-xl font-bold">Meet</span>
         </Link>
-        <Show when={roomID() !== undefined}>
-        <span class="hidden md:block">Room ID: {roomID()}</span>
+        <Show when={prop.roomID() !== undefined}>
+        <span class="hidden md:block">Room ID: {prop.roomID()}</span>
         </Show>
-        <Show when={isLoggedIn()}>
+        <Show when={prop.isLoggedIn()}>
             <div class="relative h-8 w-8 hover:cursor-pointer" onclick={() => setShowLogOut(p => !p)}>
                 <img 
-                src={user().avatar_url} 
+                src={prop.user().avatar_url} 
                 alt="Avatar"
                 class="rounded-full"
                 />
@@ -25,7 +25,7 @@ export default function Topbar({ user, isLoggedIn, roomID }: { user: Accessor<Us
                 <div class="absolute p-2 w-auto flex items-center bg-black h-12 right-0 rounded-md hover:cursor-default">
                     <div class="flex flex-col">
                     <span class="text-gray-500 text-xs">Logged in as</span>
-                    <span>{user().name}</span>
+                    <span>{prop.user().name}</span>
                     </div>
                     <div class="w-8"></div>
                     <button class="text-red-700">Logout</button>
@@ -33,7 +33,7 @@ export default function Topbar({ user, isLoggedIn, roomID }: { user: Accessor<Us
                 </Show>
             </div>
         </Show>
-        <Show when={!isLoggedIn()}>
+        <Show when={!prop.isLoggedIn()}>
             <a class="px-3 py-1 rounded-md bg-black" href={URLs.oauth_url}>Login</a>
         </Show>
     </div>

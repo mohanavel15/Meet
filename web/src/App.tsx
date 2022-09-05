@@ -45,7 +45,7 @@ const App: Component = () => {
 				<Topbar user={User} isLoggedIn={isLoggedIn} roomID={roomID} />
 				<Show when={isLoggedIn()}>
 					<Routes>
-						<Route path="/" element={<Home onCreate={CreateRoom} onJoin={JoinRoom} isLoggedIn={isLoggedIn} />} />
+						<Route path="/" element={<Home onCreate={CreateRoom} onJoin={JoinRoom} />} />
 						<Route path="/rooms/:id" element={<Room user={User} isLoggedIn={isLoggedIn} setRoomID={setRoomID} />} />
 						<Route path="*" component={PageNotFound} />
 					</Routes>

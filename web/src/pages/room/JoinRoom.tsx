@@ -18,7 +18,7 @@ interface JoinRoomProp {
     JoinCall: () => void
 }
 
-export default function JoinRoom({ state, setState, setConstraints, JoinCall }: JoinRoomProp) {
+export default function JoinRoom(prop: JoinRoomProp) {
     createMediaPermissionRequest('audio');
     createMediaPermissionRequest('video');
     const microphones = createMicrophones();
@@ -28,23 +28,23 @@ export default function JoinRoom({ state, setState, setConstraints, JoinCall }: 
     const [video, setvideo] = createSignal(false)
     
     createEffect(() => {
-        setvideo(state.video)
-        setmute(state.muted)
+        setvideo(prop.state.video)
+        setmute(prop.state.muted)
     })
 
     function setMute(bool: boolean) {
-        setState("muted", bool)
+        prop.setState("muted", bool)
     }
 
     function setVideo(bool: boolean) {
-        setState("video", bool)
+        prop.setState("video", bool)
     }
 
     return (
         <div class="pb-6 w-11/12 sm:w-1/2 xl:w-1/4  bg-gray-900 rounded-xl flex flex-col items-center">
             <div class="w-full">
-            <SelectMediaDevice title="Select Audio Input :" devices={microphones} onClick={e => setConstraints("audioInput",e.currentTarget.value)} />
-            <SelectMediaDevice title="Select Video Input :" devices={cameras} onClick={e => setConstraints("videoInput",e.currentTarget.value)} />
+            <SelectMediaDevice title="Select Audio Input :" devices={microphones} onClick={e => prop.setConstraints("audioInput",e.currentTarget.value)} />
+            <SelectMediaDevice title="Select Video Input :" devices={cameras} onClick={e => prop.setConstraints("videoInput",e.currentTarget.value)} />
             </div>
             <div class="flex">
                 <ActionButton visible={video} when={false} onclick={() => setVideo(true)}>
@@ -63,7 +63,7 @@ export default function JoinRoom({ state, setState, setConstraints, JoinCall }: 
                 <BiSolidMicrophoneOff size={20} color="#E60000"/>
                 </ActionButton>
             </div>
-            <button onClick={JoinCall} class="h-8 w-32 bg-gray-800 rounded-lg">Join Room</button>
+            <button onClick={prop.JoinCall} class="h-8 w-32 bg-gray-800 rounded-lg">Join Room</button>
         </div>
     )
 }
